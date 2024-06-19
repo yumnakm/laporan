@@ -99,19 +99,48 @@
                                 </div>
                             </div>
                             <?php 
-                            if ($data['status']=="DITERIMA") {
+                                if ($data['status'] == "DITERIMA") {
+                                    // No action needed for accepted reports
+                                } else { ?>
+                                    <a href="index.php?page=confirm_laporan&&id=<?= $data['id_laporan'] ?>" class="btn btn-sm btn-success" onClick="return confirm('Apakah Laporan Sudah Benar ?')">Terima Laporan</a>
+                                    <!-- Form untuk Tolak Laporan -->
+                                    <form action="index.php?page=tolak_laporan" method="POST" class="d-inline">
+                                        <input type="hidden" name="id_laporan" value="<?= $data['id_laporan'] ?>">
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#tolakLaporanModal<?= $data['id_laporan'] ?>">Tolak Laporan</button>
 
-                            }else {
-                            ?>
-                            <a href="index.php?page=confirm_laporan&&id=<?= $data['id_laporan'] ?>" class="btn btn-sm btn-success" onClick="return confirm('Apakah Laporan Sudah Benar ?')">Terima Laporan</a>
-                            <a href="index.php?page=tolak_laporan&&id=<?= $data['id_laporan'] ?>" class="btn btn-sm btn-danger">Tolak Laporan</a>
-                            <?php } ?>
+                                        <!-- Modal Tolak Laporan -->
+                                        <div class="modal fade" id="tolakLaporanModal<?= $data['id_laporan'] ?>" tabindex="-1" aria-labelledby="tolakLaporanModalLabel<?= $data['id_laporan'] ?>" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="tolakLaporanModalLabel<?= $data['id_laporan'] ?>">Tolak Laporan</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label for="keterangan" class="form-label">Keterangan Penolakan</label>
+                                                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                        <button type="submit" class="btn btn-danger">Tolak Laporan</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                <?php } ?>
+                            </div>
                         </div>
+                        <?php if ($data['status'] == 'DITOLAK' && !empty($data['keterangan_penolakan'])) { ?>
+                            <div class="alert alert-danger mt-2">
+                                <strong>Alasan Penolakan:</strong> <?= $data['keterangan_penolakan'] ?>
+                            </div>
+                        <?php } ?>
                     </div>
                 </div>
-            </div>
-            <?php }
-            ?>
+            <?php } ?>
         <!--container-->
     </div>
 </div>

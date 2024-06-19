@@ -26,33 +26,26 @@
                         <th><center>Tanggal Laporan</center></th>
                         <th><center>Status</center></th>
                         <th><center>Action</center></th>
+                        <th><center>Alasan Penolakan</center></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     function tgl_indo($tanggal){
-                        $bulan = array (
-                            1 =>   'Januari',
-                            'Februari',
-                            'Maret',
-                            'April',
-                            'Mei',
-                            'Juni',
-                            'Juli',
-                            'Agustus',
-                            'September',
-                            'Oktober',
-                            'November',
-                            'Desember'
+                        $bulan = array(
+                            1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
                         );
                         $pecahkan = explode('-', $tanggal);
-                        return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+                        return $pecahkan[2] . ' ' . $bulan[(int)$pecahkan[1]] . ' ' . $pecahkan[0];
                     }
 
                     include "../conn/conn.php";
                     $no = 1;
                     $id_staff = $_SESSION['id_staff'];
-                    $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a JOIN jenis_laporan as b ON b.id_jenis_laporan = a.id_jenis_laporan WHERE a.created_by = '$id_staff'");
+                    $query = mysqli_query($conn, "SELECT * FROM laporan_kegiatan as a 
+                        JOIN jenis_laporan as b ON b.id_jenis_laporan = a.id_jenis_laporan 
+                        WHERE a.created_by = '$id_staff'");
                     while ($data = mysqli_fetch_array($query)) { ?>
                         <tr>
                             <td><center><?= $no++ ?></center></td>
@@ -60,16 +53,40 @@
                             <td><center><?= ucfirst($data['judul']) ?></center></td>
                             <td><?= ucwords($data['lokasi']) ?></td>
                             <td><center><?= tgl_indo(date('Y-m-d', strtotime($data['tgl']))) ?></center></td>
-                            <td><center><span class="badge <?= $data['status']=="DITERIMA" ? ' bg-success' : ' bg-danger'?>"><?= $data['status'] ?></span></center></td>
+                            <td><center><span class="badge <?= $data['status']=="DITERIMA" ? 'bg-success' : 'bg-danger'?>"><?= $data['status'] ?></span></center></td>
                             <td>
                                 <?php
-                                if ($data['status']=="DITERIMA") {
+                                if ($data['status'] == "DITERIMA") {
                                     echo '----';
                                 } else { ?>
                                     <a href="index.php?page=edit_laporan&id=<?= $data['id_laporan'] ?>"><i class="bx bxs-pencil"></i> Edit</a> |
                                     <a href="index.php?page=delete_laporan&id=<?= $data['id_laporan'] ?>" style="color:red" onClick="return confirm('Delete This Laporan ?')"><i class="bx bxs-trash"></i> Hapus</a>
-                                <?php }
-                                ?>
+                                <?php } ?>
+                            </td>
+                            <td>
+                                <?php if ($data['status'] == 'DITOLAK' && !empty($data['keterangan_penolakan'])) { ?>
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#alasanPenolakanModal<?= $data['id_laporan'] ?>">Lihat Alasan</button>
+
+                                    <!-- Modal Alasan Penolakan -->
+                                    <div class="modal fade" id="alasanPenolakanModal<?= $data['id_laporan'] ?>" tabindex="-1" aria-labelledby="alasanPenolakanModalLabel<?= $data['id_laporan'] ?>" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="alasanPenolakanModalLabel<?= $data['id_laporan'] ?>">Alasan Penolakan</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <?= $data['keterangan_penolakan'] ?>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php } else { ?>
+                                    ----
+                                <?php } ?>
                             </td>
                         </tr>
                     <?php } ?>

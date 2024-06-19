@@ -11,20 +11,11 @@
     </div>
 </div>
 <!--end breadcrumb-->
-
 <?php
-// Include file koneksi database
 include "../conn/conn.php";
-
-// Mengambil ID laporan dari parameter GET
 $id_laporan = $_GET['id'];
-
-// Mengambil data laporan kegiatan dari database berdasarkan ID
 $data_laporan = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM laporan_kegiatan WHERE id_laporan = '$id_laporan'"));
-
-// Proses form jika tombol submit ditekan
 if (isset($_POST['submit'])) {
-    // Mengambil nilai form yang dikirimkan
     $judul = $_POST['judul'];
     $id_jenis = $_POST['id_jenis_laporan'];
     $lokasi = $_POST['lokasi'];
@@ -32,14 +23,14 @@ if (isset($_POST['submit'])) {
     $mytextarea = $_POST['mytextarea'];
     $created_at = date('Y-m-d');
     
-    // Melakukan update data laporan kegiatan ke dalam database
+    // Update laporan kegiatan di database
     mysqli_query($conn,"UPDATE laporan_kegiatan SET judul_laporan='$judul', id_jenis_laporan='$id_jenis', lokasi='$lokasi', tgl='$tgl', isi='$mytextarea', created_at='$created_at', status='PENDING' WHERE id_laporan='$id_laporan'");
     
-    // Redirect ke halaman riwayat laporan setelah proses update selesai
+    // Redirect ke halaman riwayat laporan setelah berhasil diperbarui
     echo "<script>window.location.href='index.php?page=riwayat_laporan';</script>";
+    exit;
 }
 ?>
-
 <div class="row">
     <div class="col-xl-9 mx-auto">
         <div class="card border-top border-0 border-4 border-warning">
@@ -54,35 +45,33 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-3">
                             <label for="judul" class="col-sm-3 col-form-label">Judul Laporan</label>
                             <div class="col-sm-9">
-                                <input type="text" name="judul" value="<?= $data_laporan['judul_laporan'] ?>" class="form-control" id="judul" placeholder="Judul laporan" required>
+                                <input type="text" name="judul" value="<?= $data_laporan['judul_laporan'] ?>" class="form-control" id="judul" placeholder="Judul Laporan" required>
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="inputEnterYourName" class="col-sm-3 col-form-label">Jenis Laporan</label>
+                            <label for="inputJenisLaporan" class="col-sm-3 col-form-label">Jenis Laporan</label>
                             <div class="col-sm-9">
-                                <select class="form-select mb-3" name="id_jenis_laporan" aria-label="Default select example">
+                                <select class="form-select mb-3" name="id_jenis_laporan" aria-label="Jenis Laporan" required>
                                     <?php
-                                    // Mengambil daftar jenis laporan dari database
                                     $query_jenis = mysqli_query($conn, "SELECT * FROM jenis_laporan");
                                     while ($jenis = mysqli_fetch_array($query_jenis)) {
-                                        // Menentukan opsi yang terpilih berdasarkan id jenis laporan saat ini
                                         $selected = ($jenis['id_jenis_laporan'] == $data_laporan['id_jenis_laporan']) ? 'selected' : '';
-                                        echo "<option value=\"{$jenis['id_jenis_laporan']}\" $selected>" . ucwords($jenis['judul']) . "</option>";
+                                        echo "<option value='" . $jenis['id_jenis_laporan'] . "' $selected>" . ucwords($jenis['judul']) . "</option>";
                                     }
                                     ?>
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
-                            <label for="lokasi" class="col-sm-3 col-form-label">Lokasi Kegiatan</label>
+                        <div class="row mb_3">
+                            <label for="lokasi" class="col-sm-3 col-form-label">Lokasi Laporan</label>
                             <div class="col-sm-9">
-                                <input type="text" name="lokasi" value="<?= $data_laporan['lokasi'] ?>" class="form-control" id="lokasi" placeholder="Lokasi kegiatan" required>
+                                <input type="text" name="lokasi" value="<?= $data_laporan['lokasi'] ?>" class="form-control" id="lokasi" placeholder="Lokasi Laporan" required>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label for="tgl" class="col-sm-3 col-form-label">Tanggal Laporan</label>
                             <div class="col-sm-9">
-                                <input type="date" class="form-control" name="tgl" value="<?= $data_laporan['tgl'] ?>">
+                                <input type="date" class="form-control" name="tgl" value="<?= $data_laporan['tgl'] ?>" required>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -92,7 +81,7 @@ if (isset($_POST['submit'])) {
                             </div>
                         </div>
                         <div class="row">
-                            <label class="col-sm-3 col-form-label"></label>
+                            <div class="col-sm-3"></div>
                             <div class="col-sm-9">
                                 <input type="submit" name="submit" value="Perbaharui Laporan" class="btn btn-primary px-5">
                             </div>
